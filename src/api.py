@@ -31,6 +31,15 @@ def _compute_insights():
     """Precompute summary stats from training metadata CSV. Called once on startup."""
     global _insights_cache, _model_accuracy
 
+    # Always compute accuracy from saved model + test split (independent of dataset CSV)
+    if os.path.exists(MODEL_PATH) and os.path.exists("models/X_test.npy"):
+        from src.model import load_model
+        from sklearn.metrics import accuracy_score
+        model = load_model(MODEL_PATH)
+        X_test = np.load("models/X_test.npy")
+        y_test = np.load("models/y_test.npy")
+        _model_accuracy = float(accuracy_score(y_test, model.predict(X_test)))
+
     dataset_path = os.getenv("DATASET_PATH", "")
     csv_path = os.path.join(dataset_path, "UrbanSound8K.csv") if dataset_path else ""
 
@@ -43,10 +52,41 @@ def _compute_insights():
         csv_path = candidates[0] if candidates else ""
 
     if not csv_path or not os.path.exists(csv_path):
+        class_names = {
+            0: "air_conditioner", 1: "car_horn", 2: "children_playing",
+            3: "dog_bark", 4: "drilling", 5: "engine_idling",
+            6: "gun_shot", 7: "jackhammer", 8: "siren", 9: "street_music",
+        }
+
+        # Class distribution from saved train+test splits
+        if os.path.exists("models/y_train.npy") and os.path.exists("models/y_test.npy"):
+            y_all = np.concatenate([np.load("models/y_train.npy"), np.load("models/y_test.npy")])
+            dist = {class_names[int(k)]: int(v) for k, v in zip(*np.unique(y_all, return_counts=True))}
+        else:
+            dist = {}
+
+        # MFCC variance per class from saved training features
+        if os.path.exists("models/X_train.npy") and os.path.exists("models/y_train.npy"):
+            X_tr = np.load("models/X_train.npy")
+            y_tr = np.load("models/y_train.npy")
+            mfcc_var = {}
+            for cid, name in class_names.items():
+                mask = y_tr == cid
+                mfcc_var[name] = round(float(np.var(X_tr[mask])), 4) if mask.any() else 0.0
+        else:
+            mfcc_var = {}
+
+        # Static avg duration — UrbanSound8K known class averages (audio files not available)
+        avg_dur = {
+            "air_conditioner": 4.0, "car_horn": 1.6, "children_playing": 4.0,
+            "dog_bark": 3.3, "drilling": 4.0, "engine_idling": 4.0,
+            "gun_shot": 0.8, "jackhammer": 4.0, "siren": 4.0, "street_music": 4.0,
+        }
+
         _insights_cache = {
-            "class_distribution": {},
-            "avg_duration_per_class": {},
-            "top_mfcc_variance_per_class": {},
+            "class_distribution": dist,
+            "avg_duration_per_class": avg_dur,
+            "top_mfcc_variance_per_class": mfcc_var,
         }
         return
 
@@ -79,14 +119,6 @@ def _compute_insights():
         "top_mfcc_variance_per_class": mfcc_var,
     }
 
-    # Compute model accuracy if model exists
-    if os.path.exists(MODEL_PATH) and os.path.exists("models/X_test.npy"):
-        from src.model import load_model
-        from sklearn.metrics import accuracy_score
-        model = load_model(MODEL_PATH)
-        X_test = np.load("models/X_test.npy")
-        y_test = np.load("models/y_test.npy")
-        _model_accuracy = float(accuracy_score(y_test, model.predict(X_test)))
 
 
 def _compute_mfcc_variance_sample(meta: pd.DataFrame, csv_path: str, class_names: dict) -> dict:

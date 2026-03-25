@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg:        #0c0b09;
+    --surface:   #131109;
+    --surface-2: #1a1812;
+    --border:    #1e1b12;
+    --border-hi: #2c2820;
+    --amber:     #f0a020;
+    --amber-10:  rgba(240, 160, 32, 0.10);
+    --amber-20:  rgba(240, 160, 32, 0.20);
+    --text:      #ddd8ce;
+    --text-2:    #a09888;
+    --text-3:    #786e62;
+    --green:     #44c87c;
+    --red:       #e04848;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: var(--amber);
+    color: #000;
+  }
+
+  ::-webkit-scrollbar          { width: 3px; height: 3px; }
+  ::-webkit-scrollbar-track    { background: var(--bg); }
+  ::-webkit-scrollbar-thumb    { background: var(--border-hi); }
+
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23786e62'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+}
+
+@layer components {
+
+  /* ── Typography ───────────────────────────────────────── */
+
+  .display {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 0.92;
+  }
+
+  .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  /* ── Surfaces ─────────────────────────────────────────── */
+
+  .surface {
+    background: var(--surface);
+    border: 1px solid var(--border-hi);
+  }
+
+  /* ── Drop zone with grid texture ──────────────────────── */
+
+  .drop-zone {
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    border: 1px dashed var(--border-hi);
+    background: var(--bg);
+  }
+
+  .drop-zone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+  }
+
+  .drop-zone:hover           { border-color: var(--text-3); }
+  .drop-zone.is-dragging     { border-color: var(--amber); background: var(--amber-10); }
+
+  /* ── Buttons ──────────────────────────────────────────── */
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    padding: 10px 22px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: var(--amber);
+    color: #000;
+  }
+  .btn-primary:hover:not(:disabled)   { background: #ffc048; }
+  .btn-primary:disabled               { background: var(--border-hi); color: var(--text-3); cursor: not-allowed; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--amber);
+    border: 1px solid var(--amber);
+  }
+  .btn-outline:hover:not(:disabled)   { background: var(--amber-10); }
+  .btn-outline:disabled               { opacity: 0.35; cursor: not-allowed; }
+
+  /* ── Section header ───────────────────────────────────── */
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-hi);
+    margin-bottom: 18px;
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    color: var(--amber);
+  }
+
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text);
+  }
+
+  /* ── Status / alert boxes ─────────────────────────────── */
+
+  .alert-error {
+    padding: 10px 14px;
+    background: rgba(224, 72, 72, 0.08);
+    border: 1px solid rgba(224, 72, 72, 0.30);
+    color: var(--red);
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+
+  .alert-success {
+    padding: 10px 14px;
+    background: rgba(68, 200, 124, 0.08);
+    border: 1px solid rgba(68, 200, 124, 0.30);
+    color: var(--green);
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+}

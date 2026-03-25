@@ -2,10 +2,13 @@
 
 An end-to-end MLOps pipeline for classifying urban audio clips into 10 sound categories using a scikit-learn SVM trained on the UrbanSound8K dataset.
 
+Dataset : (UrbanSound8K)[https://www.kaggle.com/datasets/chrisfilo/urbansound8k?resource=download]
+
 ## Demo
 
 - YouTube: [ADD YOUTUBE LINK]
-- Live URL: [ADD DEPLOYED URL]
+- Live URL Frontend: [https://summative-assignment-mlop.vercel.app/insights]
+- Live URL Backend: [https://summative-assignment-mlop.vercel.app/insights]
 
 ## Description
 
